@@ -1,108 +1,87 @@
 const bodyParser = require("body-parser");
 // const { bodyParser } = require("./middleware/bodyParser");
 const express = require("express");
+const { getDB, connectDB } = require("./db");
+const { ObjectId } = require("mongodb");
 const app = express();
 const PortNumber = 5000;
 const LocalHost = "localhost";
-let UsersData = [];
 
 app.use(bodyParser.json());
 
-// app.post("/user",bodyParser.json(), (req, res) => {
-//   const userData = {
-//     ...req.body,
-//     userId: Date.now(),
-//   };
-//   UsersData.push(userData);
-//   res.status(201).json({ data: UsersData });
-// });
-
-// app.get("/user", (req, res) => {
-//   res.status(200).json({ data: UsersData });
-//   console.log(UsersData);
-// });
-
-// app.delete("/user/:id", (req, res) => {
-//   const { id } = req.params;
-//   const index = UsersData.findIndex((data) => data.userId == id);
-
-//   if (index === -1) {
-//     return res.status(404).json({ message: `User id is ${id} notFound` });
-//   }
-
-//   const deletedUser = UsersData.splice(index, 1);
-
-//   res.json({
-//     data: UsersData,
-//     message: deletedUser[0],
-//     message: `${id} is Deleted`,
-//   });
-// });
-
-// app.get("/user/:id", (req, res) => {
-//   const { id } = req.params;
-//   const uniqueUser = UsersData.find((u) => u.userId == id);
-//   res.status(200).json({ data: uniqueUser });
-// });
-
-// app.put("/user/:id",bodyParser.json(), (req, res) => {
-//   const { id } = req.params;
-
-//   const exisitingUser = UsersData.find((u) => u.userId == id);
-//   const newUser = UsersData.filter((user) => user.userId != id);
-//   let updatedUser = {
-//     ...req.body,
-//     userId: exisitingUser.userId,
-//   };
-//   newUser.push(updatedUser);
-//   UsersData = newUser;
-
-//   res.status(201).json({ data: updatedUser });
-// });
-
-app.post("/user", (req, res) => {
-  const userDetail = {
-    ...req.body,
-    userId: Date.now(),
-  };
-  UsersData.push(userDetail);
-  res.status(201).json({ UserInformation: UsersData });
-});
-app.get("/user", (req, res) => {
-  res.status(200).json({ userInformation: UsersData });
+app.post("/user", async (req, res) => {
+  try {
+    const userData = {
+      ...req.body,
+    };
+    const dataBase = await getDB();
+    await dataBase.collection("users").insertOne(userData);
+    console.log(dataBase, "dataBase");
+    res.status(201).json({ users: userData });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
-app.get("/user/:id", (req, res) => {
+app.get("/user", async (req, res) => {
+  try {
+    const dataBase = await getDB();
+    const users = await dataBase.collection("users").find().toArray();
+    console.log(users);
+    res.status(200).json({ users });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: "Internal Server Error " });
+  }
+});
+
+app.get("/user/:id", async (req, res) => {
   const { id } = req.params;
-  const uniqueUser = UsersData.find((user) => user.userId == id);
-  res.status(201).json({ userInformation: uniqueUser });
+  const dataBase = await getDB();
+  const userId = new ObjectId(id);
+  const condition = { _id: userId };
+  const uniqueUser = await dataBase.collection("users").findOne(condition);
+  res.status(201).json({ uniqueUser });
 });
 
-app.delete("/user/:id", (req, res) => {
+app.delete("/user/:id", async (req, res) => {
   const { id } = req.params;
-  UsersData = UsersData.filter((u) => u.userId != id);
+  const dataBase = await getDB();
+  const userId = new ObjectId(id);
+  const condition = { _id: userId };
+  const deletedUser = await dataBase.collection("users").deleteOne(condition);
+
   res.json({
-    userInformation: UsersData,
+    deletedUser,
     message: `User Deleted SuccessFully !`,
   });
 });
 
-app.put("/user/:id", (req, res) => {
+app.put("/user/:id", async (req, res) => {
   const { id } = req.params;
+  const payload = req.body;
 
-  const exisitingUser = UsersData.find((u) => u.userId == id);
-
-  const newUser = UsersData.filter((u) => u.userId != id);
+  const dataBase = await getDB();
+  const userId = new ObjectId(id);
+  const condition = { _id: userId };
+  const exisitingUser = dataBase.collection("users").findOne(condition);
 
   const updatedUser = {
-    ...req.body,
-    userId: exisitingUser.userId,
+    ...payload,
+    ...exisitingUser,
   };
-  newUser.push(updatedUser);
-  UsersData = newUser;
-  res.status(201).json({ UpdatedUser: updatedUser, allUser: UsersData });
+  await dataBase
+    .collection("users")
+    .updateOne(condition, { $set: updatedUser });
+
+  res.status(201).json({ updatedUser, message: "User Update successfully" });
 });
 
-app.listen(PortNumber, LocalHost, () => {
-  console.log(`server is on ${LocalHost} ${PortNumber}`);
-});
+const startServer = async () => {
+  await connectDB();
+  app.listen(PortNumber, LocalHost, () => {
+    console.log(`app is running on , and ${LocalHost}:${PortNumber}`);
+  });
+};
+
+startServer();

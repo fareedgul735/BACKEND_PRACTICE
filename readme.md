@@ -29,3 +29,21 @@ Code Meaning Use Case
 404 → cheez hi nahi mili
 
 500 → hamari (server) taraf se error
+
+MONGODB CRUD FUNCTIONS:
+
+insertOne()
+
+insertMany()
+
+findOne()
+
+find()
+
+updateOne()
+
+updateMany()
+
+deleteOne()
+
+deleteMany()
