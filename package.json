@@ -1,15 +1,19 @@
 {
+  "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js"
+    "start": "node ./src/app.mjs",
+    "start:dev": "nodemon ./src/app.mjs"
   },
   "dependencies": {
     "body-parser": "^2.2.0",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "mongodb": "^6.19.0",
-    "mongoose": "^8.17.1"
+    "mongoose": "^8.17.1",
+    "nodemailer": "^7.0.6"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
-  }
+  },
+  "type": "module"
 }

@@ -47,3 +47,11 @@ updateMany()
 deleteOne()
 
 deleteMany()
+
+Joi ka main kaam hai data validation ko easy aur clean banana. Instead of har jagah if-else likhne ke, hum ek schema bana dete hain aur usse validate function ke sath check kar lete hain. Yeh backend APIs ko secure aur bug-free banata hai.
+
+{ timestamps: true } ka matlab hai ke MongoDB automatically do fields add karega:
+
+createdAt
+
+updatedAt
