@@ -5,20 +5,6 @@ import validate from "../middleware/validator.js";
 
 const router = Router();
 
-// router.post("/user", async (req, res) => {
-//   try {
-//     const { error, value } = userSchemaValidate.validate(req.body);
-//     if (error) {
-//       res.status(400).json({ message: error.details[0].message });
-//     }
-//     const addUser = new User(value);
-//     await addUser.save();
-//     res.status(200).json({ data: addUser });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({ message: "Server error", error: err.message });
-//   }
-// });
 
 router.post("/user", validate(userSchemaValidate), async (req, res) => {
   try {

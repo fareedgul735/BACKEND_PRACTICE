@@ -2,8 +2,6 @@ import Joi from "joi";
 import { Password } from "../../lib/pattern.mjs";
 
 const signupSchema = Joi.object({
-  name: Joi.string().min(3).required(),
-  age: Joi.number(),
   userName: Joi.string().min(3).max(18).required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(8).pattern(Password).required().messages({

@@ -104,3 +104,7 @@ Notifications
 Jaise "Aapka password change ho gaya hai" → security purpose ke liye email bhejna.
 
 Ye bhi Nodemailer se hota hai.
+
+Stateful API: Server tumhari history/state yaad rakhta hai → zyada heavy hota hai aur scaling mushkil.
+
+Stateless API: Server kuch yaad nahi rakhta → har request independent hoti hai → light aur scalable,
